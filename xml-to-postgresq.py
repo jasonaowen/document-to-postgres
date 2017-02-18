@@ -21,9 +21,7 @@ a table in a PostgreSQL database.
 """
 
 import argparse
-import fileinput
 import psycopg2
-from psycopg2.extras import Json
 
 parser = argparse.ArgumentParser(description='Load an XML document into a PostgreSQL database.')
 parser.add_argument('user')
