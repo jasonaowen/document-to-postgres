@@ -39,9 +39,9 @@ conn = psycopg2.connect("dbname={} user={}".format(args.dbname, args.user))
 cur = conn.cursor()
 
 for filename in args.filename:
-  with open(filename) as xml_file:
-    xml = xml_file.read()
-    cur.execute("INSERT INTO {} ({}) VALUES (XMLPARSE (DOCUMENT %s))".format(args.table, args.column), [xml])
+    with open(filename) as xml_file:
+        xml = xml_file.read()
+        cur.execute("INSERT INTO {} ({}) VALUES (XMLPARSE (DOCUMENT %s))".format(args.table, args.column), [xml])
 
 conn.commit()
 cur.close()

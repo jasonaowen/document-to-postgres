@@ -40,8 +40,8 @@ conn = psycopg2.connect("dbname={} user={}".format(args.dbname, args.user))
 cur = conn.cursor()
 
 for line in fileinput.input(args.filename):
-  parsed_line = json.loads(line)
-  cur.execute("INSERT INTO {} ({}) VALUES (%s)".format(args.table, args.column), [Json(parsed_line)])
+    parsed_line = json.loads(line)
+    cur.execute("INSERT INTO {} ({}) VALUES (%s)".format(args.table, args.column), [Json(parsed_line)])
 
 conn.commit()
 cur.close()
