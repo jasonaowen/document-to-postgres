@@ -31,7 +31,12 @@ parser.add_argument('column')
 parser.add_argument('filename', nargs='*', default='-')
 
 args = parser.parse_args()
-print "Database: {}, user: {}, table: {}, column: {}".format(args.dbname, args.user, args.table, args.column)
+print("Database: {}, user: {}, table: {}, column: {}".format(
+    args.dbname,
+    args.user,
+    args.table,
+    args.column,
+))
 
 conn = psycopg2.connect("dbname={} user={}".format(args.dbname, args.user))
 cur = conn.cursor()
