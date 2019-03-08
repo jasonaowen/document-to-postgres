@@ -26,32 +26,56 @@ import json
 import psycopg2
 from psycopg2.extras import Json
 
-parser = argparse.ArgumentParser(description='Load streaming JSON data into a PostgreSQL database.')
-parser.add_argument('user')
-parser.add_argument('dbname')
-parser.add_argument('table')
-parser.add_argument('column')
-parser.add_argument('filename', nargs='*', default='-')
 
-args = parser.parse_args()
-print("Database: {}, user: {}, table: {}, column: {}".format(
-    args.dbname,
-    args.user,
-    args.table,
-    args.column,
-))
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Load streaming JSON data into a PostgreSQL database.'
+    )
+    parser.add_argument('user')
+    parser.add_argument('dbname')
+    parser.add_argument('table')
+    parser.add_argument('column')
+    parser.add_argument('filename', nargs='*', default='-')
 
-conn = psycopg2.connect("dbname={} user={}".format(args.dbname, args.user))
-cur = conn.cursor()
+    return parser.parse_args()
 
-for line in fileinput.input(args.filename):
-    try:
-        parsed_line = json.loads(line)
-        cur.execute("INSERT INTO {} ({}) VALUES (%s)".format(args.table, args.column), [Json(parsed_line)])
-    except ValueError as e:
-        e.args += (fileinput.filename(),)
-        raise
 
-conn.commit()
-cur.close()
-conn.close()
+def load_line_delimited_json_data(user, dbname, table, column, filenames):
+    conn = psycopg2.connect("dbname={} user={}".format(dbname, user))
+    cur = conn.cursor()
+
+    for line in fileinput.input(filenames):
+        try:
+            parsed_line = json.loads(line)
+            cur.execute(
+                "INSERT INTO {} ({}) VALUES (%s)".format(
+                    table,
+                    column
+                ),
+                [Json(parsed_line)]
+            )
+        except ValueError as e:
+            e.args += (fileinput.filename(),)
+            raise
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    print("Database: {}, user: {}, table: {}, column: {}".format(
+        args.dbname,
+        args.user,
+        args.table,
+        args.column,
+    ))
+
+    load_line_delimited_json_data(
+        args.user,
+        args.dbname,
+        args.table,
+        args.column,
+        args.filename
+    )
