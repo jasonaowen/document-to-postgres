@@ -43,17 +43,12 @@ def parse_args():
 def load_line_delimited_json_data(user, dbname, table, column, filenames):
     conn = psycopg2.connect("dbname={} user={}".format(dbname, user))
     cur = conn.cursor()
+    insert_statement = "INSERT INTO {} ({}) VALUES (%s)".format(table, column)
 
     for line in fileinput.input(filenames):
         try:
             parsed_line = json.loads(line)
-            cur.execute(
-                "INSERT INTO {} ({}) VALUES (%s)".format(
-                    table,
-                    column
-                ),
-                [Json(parsed_line)]
-            )
+            cur.execute(insert_statement, [Json(parsed_line)])
         except ValueError as e:
             e.args += (fileinput.filename(),)
             raise

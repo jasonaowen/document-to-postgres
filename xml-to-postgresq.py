@@ -40,17 +40,17 @@ def parse_args():
 def load_xml_documents(user, dbname, table, column, filenames):
     conn = psycopg2.connect("dbname={} user={}".format(args.dbname, args.user))
     cur = conn.cursor()
+    insert_statement = (
+        "INSERT INTO {} ({}) VALUES (XMLPARSE (DOCUMENT %s))".format(
+            args.table,
+            args.column
+        )
+    )
 
     for filename in filenames:
         with open(filename) as xml_file:
             xml = xml_file.read()
-            cur.execute(
-                "INSERT INTO {} ({}) VALUES (XMLPARSE (DOCUMENT %s))".format(
-                    args.table,
-                    args.column
-                ),
-                [xml]
-            )
+            cur.execute(insert_statement, [xml])
 
     conn.commit()
     cur.close()
