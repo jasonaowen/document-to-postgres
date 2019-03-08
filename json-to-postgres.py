@@ -29,13 +29,26 @@ from psycopg2.extras import Json
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Load streaming JSON data into a PostgreSQL database.'
+        description='''
+            Load one or more lines of JSON into a PostgreSQL database. The
+            target database table must have one json or jsonb column (specified
+            via the `column` argument), and any other columns in the table must
+            have default values.
+        ''',
+        epilog='''
+            See also the PostgreSQL table creation syntax
+            (https://www.postgresql.org/docs/current/sql-createtable.html) and
+            the PostgreSQL xml data type
+            (https://www.postgresql.org/docs/current/datatype-json.html).
+        ''',
     )
-    parser.add_argument('user')
-    parser.add_argument('dbname')
-    parser.add_argument('table')
-    parser.add_argument('column')
-    parser.add_argument('filename', nargs='*', default='-')
+    parser.add_argument('user', help='user to connect to the database as')
+    parser.add_argument('dbname', help='database to connect to')
+    parser.add_argument('table', help='table to insert into')
+    parser.add_argument('column', help='''column to insert into; the data type
+        of the column must be json or jsonb''')
+    parser.add_argument('filename', nargs='*', default='-', help='''Filenames of
+        line-delimited JSON data files to load''')
 
     return parser.parse_args()
 
